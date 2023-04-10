@@ -1,1 +1,3 @@
-# Bookmarks \n A social website by Django
+# Bookmarks
+
+A social website by Django

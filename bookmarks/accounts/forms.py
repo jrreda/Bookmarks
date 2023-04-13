@@ -24,11 +24,25 @@ class UserRegistrationForm(forms.ModelForm):
             raise forms.ValidationError("Passwords don't match.")
         return cd["password2"]
 
+    # preventing users from using an existing email
+    def clean_email(self):
+        data = self.changed_data["email"]
+        if User.objects.filter(email=data).exists():
+            raise forms.ValidationError("Email already exists.")
+        return data
+
 
 class UserEditForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ["first_name", "last_name", "email"]
+
+    # preventing users from editing email to an existing email
+    def clean_email(self):
+        data = self.changed_data["email"]
+        if User.objects.exclude(id=self.instance.id).filter(email=data).exists():
+            raise forms.ValidationError("Email already exists.")
+        return data
 
 
 class ProfileEditForm(forms.ModelForm):

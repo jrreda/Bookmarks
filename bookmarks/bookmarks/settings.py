@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from environs import Env
+
+env = Env()
+env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +29,7 @@ SECRET_KEY = "django-insecure-361eb9#nhlkp=06$tkfrfd)_z98ew#ih&xl(1dr1n!z8r9otlj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["mysite.com", "localhost", "127.0.0.1"]
 
 
 # Application definition
@@ -39,6 +43,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Third Party
+    "social_django",
+    "django_extensions",
 ]
 
 MIDDLEWARE = [
@@ -144,4 +151,34 @@ MEDIA_ROOT = BASE_DIR / "media"
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "accounts.authentication.EmailAuthBackend",
+    "social_core.backends.facebook.FacebookOAuth2",  # new
+    "social_core.backends.twitter.TwitterOAuth",  # new
+    "social_core.backends.google.GoogleOAuth2",  # new
+]
+
+
+## Social login
+# Facebook
+SOCIAL_AUTH_FACEBOOK_KEY = env.str("FACEBOOK_KEY")  # Facebook App ID
+SOCIAL_AUTH_FACEBOOK_SECRET = env.str("FACEBOOK_SECRET")  # Facebook App Secret
+SOCIAL_AUTH_FACEBOOK_SCOPE = ["email"]
+# Twitter
+SOCIAL_AUTH_TWITTER_KEY = env.str("TWITTER_KEY")
+SOCIAL_AUTH_TWITTER_SECRET = env.str("TWITTER_SECRET")
+# Google
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env.str("GOOGLE_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env.str("GOOGLE_SECRET")
+
+# https://python-social-auth.readthedocs.io/en/latest/pipeline.html
+SOCIAL_AUTH_PIPELINE = [
+    "social_core.pipeline.social_auth.social_details",
+    "social_core.pipeline.social_auth.social_uid",
+    "social_core.pipeline.social_auth.auth_allowed",
+    "social_core.pipeline.social_auth.social_user",
+    "social_core.pipeline.user.get_username",
+    "social_core.pipeline.user.create_user",
+    "accounts.authentication.create_profile",
+    "social_core.pipeline.social_auth.associate_user",
+    "social_core.pipeline.social_auth.load_extra_data",
+    "social_core.pipeline.user.user_details",
 ]

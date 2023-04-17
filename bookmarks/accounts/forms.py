@@ -39,7 +39,7 @@ class UserEditForm(forms.ModelForm):
 
     # preventing users from editing email to an existing email
     def clean_email(self):
-        data = self.changed_data["email"]
+        data = self.cleaned_data["email"]
         if User.objects.exclude(id=self.instance.id).filter(email=data).exists():
             raise forms.ValidationError("Email already exists.")
         return data
